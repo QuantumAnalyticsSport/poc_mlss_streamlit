@@ -148,8 +148,8 @@ Analyze the following metabolic profile for an athlete:
 - Lt2 (Max Lactate Steady State) occurs at {sAT:.1f} W  
 
 
-1) Compare the values to the litterature and normative value for elite athletes, especially VO2max, Lt2, fatmax Watts and fat oxydation
-2) Explain strengths and weaknesses of this athlete for a long distance cycling and areas to train 
+1) Compare the values to the litterature and normative value for elite athletes, especially VO2max, Lt2, fatmax Watts and fat oxydation 
+2) Explain strengths and weaknesses of this athlete for a long distance cycling and areas to train. Use the % of VO2max at Lt2 for that and compare to endurance vs more punchy athlete
 3) Give the profile of the cyclist : more punchy or endurance rider and which race (Grand tour, classic, sprints, time trial) suits him the most 
 
 do it in maximum 250 words
