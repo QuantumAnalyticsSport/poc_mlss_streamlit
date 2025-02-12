@@ -126,7 +126,7 @@ table_data = {
     np.round(res[res.Cho>90].iloc[0].Power / map * 100,1)],
     'Lt1':[lt1.Power.round(0), lt1.Fat.round(1), lt1.Cho.round(1), np.round(lt1.Power/map*100,1)],
     
-    'MLSS': [np.round(sAT,0), 0, np.round(CHO_util[arg_sAT],1), np.round((res.loc[arg_sAT].Power/map)*100,1)],
+    'MLSS': [np.round(sAT,0), 0, np.round(CHO_util[arg_sAT],1), np.round(sAT/map)*100,1)],
     'Vo2max': [np.round(map,1), 0, np.round(res[res.Power>=map].iloc[0].Cho,1),100]
     
 }
@@ -141,11 +141,11 @@ st.subheader("Performance Analysis")
 prompt = f"""
 Analyze the following metabolic profile for an athlete:
 
-- VO2max: {np.round(vo2max,1)} ml/min/kg
-- VLaMax: {np.round(vlamax,1)} mmol/L/s
+- VO2max: {vo2max} ml/min/kg
+- VLaMax: {vlamax} mmol/L/s
 - FatMax occurs at {res[res.index == res.Fat.argmax()].Power.iloc[0]} W with this value of consommation {np.max(Fat_util) * 9.5}
-- Lt1 is at {np.round(lt1.Power.round(0),1):} W
-- Lt2 (Max Lactate Steady State) occurs at {np.round(sAT,1):.1f} W  
+- Lt1 is at {(lt1.Power.round(0):} W
+- Lt2 (Max Lactate Steady State) occurs at {np.round(sAT,1):.0f} W  
 
 
 1) Compare the values to the litterature and normative value for elite athletes, especially VO2max, Lt2, fatmax Watts and fat oxydation 
