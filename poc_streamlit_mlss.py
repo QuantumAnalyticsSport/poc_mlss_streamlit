@@ -251,7 +251,7 @@ st.session_state.analysis_text = st.text_area("AI Performance Analysis", st.sess
 
 if st.button("Generate AI Analysis"):
     response = client.chat.completions.create(
-    model="gpt-4o-mini",  #gpt-3.5-turbo
+    model="gpt-4o-mini",  # gpt-3.5-turbo
     messages=[{"role": "user", "content": prompt}]
 )
 
