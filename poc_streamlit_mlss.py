@@ -141,11 +141,11 @@ st.subheader("Performance Analysis")
 prompt = f"""
 Analyze the following metabolic profile for an athlete:
 
-- VO2max: {vo2max} ml/min/kg
-- VLaMax: {vlamax} mmol/L/s
+- VO2max: {np.round(vo2max,1)} ml/min/kg
+- VLaMax: {np.round(vlamax,1)} mmol/L/s
 - FatMax occurs at {res[res.index == res.Fat.argmax()].Power.iloc[0]} W with this value of consommation {np.max(Fat_util) * 9.5}
-- Lt1 is at {lt1.Power.round(0):} W
-- Lt2 (Max Lactate Steady State) occurs at {sAT:.1f} W  
+- Lt1 is at {np.round(lt1.Power.round(0),1):} W
+- Lt2 (Max Lactate Steady State) occurs at {np.round(sAT,1):.1f} W  
 
 
 1) Compare the values to the litterature and normative value for elite athletes, especially VO2max, Lt2, fatmax Watts and fat oxydation 
