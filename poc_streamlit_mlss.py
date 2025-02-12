@@ -33,6 +33,8 @@ def get_MAP(VO2max, weight):
     float: Maximum Aerobic Power (MAP)
     """
     return ((VO2max / 1000) * weight - 0.435) / 0.01141
+
+
 # Function to generate PDF
 
 
@@ -115,19 +117,28 @@ lt1 = lt1_zone[(lt1_zone.Lactate < lt1_zone.Lactate.max()-.2)].iloc[0]
 
 # Summary Table
 table_data = {
-    'Metric': ['Power', 'Kcal/h', 'Carbs g/h', '% VO2max'],
+    'Metric': ['Power', 'Fat - Kcal/h', 'Carbs - g/h', '% VO2max'],
     'FatMax': [res[res.index == res.Fat.argmax()].Power.iloc[0] , 
     res[res.index == res.Fat.argmax()].Fat.iloc[0] * 9.5, 
     res[res.index == res.Fat.argmax()].Cho.iloc[0], 
     np.round(res[res.index == res.Fat.argmax()].Power.iloc[0] / map * 100,1)],
-    'CarbMax': [res[res.Cho>90].iloc[0].Power.round(0), 
+    'CarbMax': [res[res.Cho > 90].iloc[0].Power.round(0), 
     res[res.Cho>90].iloc[0].Fat.round(1), 
     res[res.Cho>90].iloc[0].Cho.round(1), 
     np.round(res[res.Cho>90].iloc[0].Power / map * 100,1)],
-    'Lt1':[lt1.Power.round(0), lt1.Fat.round(1), lt1.Cho.round(1), np.round(lt1.Power/map*100,0)],
+    'Lt1':[lt1.Power.round(0), 
+           lt1.Fat.round(1), 
+           lt1.Cho.round(1), 
+           np.round(lt1.Power/map*100,0)],
     
-    'MLSS': [np.round(sAT,0), 0, np.round(CHO_util[arg_sAT],1), np.round(sAT/map*100,0)],
-    'Vo2max': [np.round(map,1), 0, np.round(res[res.Power>=map].iloc[0].Cho,1),100]
+    'MLSS': [np.round(sAT,0), 
+             0, 
+             np.round(CHO_util[arg_sAT],1), 
+             np.round(sAT/map*100,0)],
+    'Vo2max': [np.round(map,1), 
+               0, 
+               np.round(res[res.Power>=map].iloc[0].Cho,1),
+               100]
     
 }
 
@@ -145,7 +156,7 @@ Analyze the following metabolic profile for an athlete:
 - VLaMax: {vlamax} mmol/L/s
 - FatMax occurs at {res[res.index == res.Fat.argmax()].Power.iloc[0]} W with this value of consommation {np.max(Fat_util) * 9.5}
 - Lt1 is at {(lt1.Power.round(0):} W
-- Lt2 (Max Lactate Steady State) occurs at {np.round(sAT,1):.0f} W  
+- Lt2 (Max Lactate Steady State) occurs at {np.round(sAT,1):.1f} W  
 
 
 1) Compare the values to the litterature and normative value for elite athletes, especially VO2max, Lt2, fatmax Watts and fat oxydation 
