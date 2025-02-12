@@ -110,7 +110,7 @@ res = pd.DataFrame([Intensity, vLanet, VO2ss,CHO_util, Fat_util], index = ['Powe
 res = res.T
 mini = res[res.index <= arg_sAT]#.Lactate.argmax()
 lt1_zone = mini[mini.index>mini.Lactate.argmax()]
-lt1 = lt1_zone[(lt1_zone.Lactate < lt1_zone.Lactate.max()-.25)].iloc[0]
+lt1 = lt1_zone[(lt1_zone.Lactate < lt1_zone.Lactate.max()-.2)].iloc[0]
 
 
 # Summary Table
