@@ -233,7 +233,7 @@ def generate_pdf(figures, table_data, analysis_text):
 
     # Save PDF to BytesIO
     pdf_buffer = BytesIO()
-    pdf_content = pdf.output(dest="S").encode("latin1")
+    pdf_content = pdf.output(dest="S").encode("utf-8")
     pdf_buffer.write(pdf_content)
     pdf_buffer.seek(0)
     
