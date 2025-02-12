@@ -4,4 +4,3 @@ numpy
 openai
 pandas
 fpdf
-io
