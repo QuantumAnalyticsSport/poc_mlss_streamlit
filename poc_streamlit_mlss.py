@@ -127,7 +127,7 @@ table_data = {
     'Lt1':[lt1.Power.round(0), lt1.Fat.round(1), lt1.Cho.round(1), np.round(lt1.Power/map*100,1)],
     
     'MLSS': [np.round(sAT,0), 0, np.round(CHO_util[arg_sAT],1), np.round((res.loc[arg_sAT].Power/map)*100,1)],
-    'Vo2max': [map, 0, res[res.Power>=vo2max/(Ks4/weight)].iloc[0].Cho,100]
+    'Vo2max': [np.round(map,1), 0, np.round(res[res.Power>=map].iloc[0].Cho,1),100]
     
 }
 
