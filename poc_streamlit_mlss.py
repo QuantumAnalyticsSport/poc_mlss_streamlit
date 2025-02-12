@@ -124,9 +124,9 @@ table_data = {
     res[res.Cho>90].iloc[0].Fat.round(1), 
     res[res.Cho>90].iloc[0].Cho.round(1), 
     np.round(res[res.Cho>90].iloc[0].Power / map * 100,1)],
-    'Lt1':[lt1.Power.round(0), lt1.Fat.round(1), lt1.Cho.round(1), np.round(lt1.Power/map*100,1)],
+    'Lt1':[lt1.Power.round(0), lt1.Fat.round(1), lt1.Cho.round(1), np.round(lt1.Power/map*100,0)],
     
-    'MLSS': [np.round(sAT,0), 0, np.round(CHO_util[arg_sAT],1), np.round(sAT/map)*100,1)],
+    'MLSS': [np.round(sAT,0), 0, np.round(CHO_util[arg_sAT],1), np.round(sAT/map*100,0)],
     'Vo2max': [np.round(map,1), 0, np.round(res[res.Power>=map].iloc[0].Cho,1),100]
     
 }
