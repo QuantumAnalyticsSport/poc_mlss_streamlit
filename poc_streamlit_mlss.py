@@ -48,6 +48,7 @@ weight = st.slider("Weight (kg)", 50, 100, 75)
 # Calculations
 VolRel = get_VolRel(sex, fat)
 Ks4 = 11.7 #weight * vo2max / 400
+map = weight * vo2max/Ks4
 Ks1 = 0.25 ** 2
 Ks2 = 1.1 ** 3
 Ks3 = 0.02049 / VolRel
@@ -118,15 +119,15 @@ table_data = {
     'FatMax': [res[res.index == res.Fat.argmax()].Power.iloc[0] , 
     res[res.index == res.Fat.argmax()].Fat.iloc[0] * 9.5, 
     res[res.index == res.Fat.argmax()].Cho.iloc[0], 
-    np.round(res[res.index == res.Fat.argmax()].Vo2.iloc[0] / vo2max * 100,1)],
+    np.round(res[res.index == res.Fat.argmax()].Power.iloc[0] / map * 100,1)],
     'CarbMax': [res[res.Cho>90].iloc[0].Power.round(0), 
     res[res.Cho>90].iloc[0].Fat.round(1), 
     res[res.Cho>90].iloc[0].Cho.round(1), 
-    np.round(res[res.Cho>90].iloc[0].Vo2 / vo2max * 100,1)],
-    'Lt1':[lt1.Power.round(0), lt1.Fat.round(1), lt1.Cho.round(1), np.round(lt1.Vo2/vo2max*100,1)],
+    np.round(res[res.Cho>90].iloc[0].Power / map * 100,1)],
+    'Lt1':[lt1.Power.round(0), lt1.Fat.round(1), lt1.Cho.round(1), np.round(lt1.Power/map*100,1)],
     
-    'MLSS': [np.round(sAT,0), 0, np.round(CHO_util[arg_sAT],1), np.round((res.loc[arg_sAT].Vo2/vo2max)*100,1)],
-    'Vo2max': [get_MAP(vo2max, weight), 0, res[res.Power>=vo2max/(Ks4/weight)].iloc[0].Cho,100]
+    'MLSS': [np.round(sAT,0), 0, np.round(CHO_util[arg_sAT],1), np.round((res.loc[arg_sAT].Power/map)*100,1)],
+    'Vo2max': [map, 0, res[res.Power>=vo2max/(Ks4/weight)].iloc[0].Cho,100]
     
 }
 
