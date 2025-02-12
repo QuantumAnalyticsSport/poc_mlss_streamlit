@@ -156,7 +156,7 @@ do it in maximum 250 words
 
 #client = OpenAI(api_key = "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")
 
-client = OpenAI(api_key = "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")
+client = OpenAI(api_key = st.secrets["openai"]["api_key"])
 
 
 
