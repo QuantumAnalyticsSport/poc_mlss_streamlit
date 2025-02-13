@@ -33,8 +33,6 @@ def get_MAP(VO2max, weight):
     float: Maximum Aerobic Power (MAP)
     """
     return ((VO2max / 1000) * weight - 0.435) / 0.01141
-
-
 # Function to generate PDF
 
 
@@ -117,28 +115,19 @@ lt1 = lt1_zone[(lt1_zone.Lactate < lt1_zone.Lactate.max()-.2)].iloc[0]
 
 # Summary Table
 table_data = {
-    'Metric': ['Power', 'Fat Kcal/h', 'Carbs g/h', '% VO2max'],
-    'FatMax': [res[res.index == res.Fat.argmax()].Power.iloc[0].round(0) , 
-    res[res.index == res.Fat.argmax()].Fat.iloc[0].round(0)  * 9.5, 
-    res[res.index == res.Fat.argmax()].Cho.iloc[0].round(0) , 
-    np.round(res[res.index == res.Fat.argmax()].Power.iloc[0].round(0) / map * 100,1)],
-    'CarbMax': [res[res.Cho > 90].iloc[0].Power.round(0), 
-    res[res.Cho>90].iloc[0].Fat.round(0), 
-    res[res.Cho>90].iloc[0].Cho.round(0), 
+    'Metric': ['Power', 'Kcal/h', 'Carbs g/h', '% VO2max'],
+    'FatMax': [res[res.index == res.Fat.argmax()].Power.iloc[0] , 
+    res[res.index == res.Fat.argmax()].Fat.iloc[0] * 9.5, 
+    res[res.index == res.Fat.argmax()].Cho.iloc[0], 
+    np.round(res[res.index == res.Fat.argmax()].Power.iloc[0] / map * 100,1)],
+    'CarbMax': [res[res.Cho>90].iloc[0].Power.round(0), 
+    res[res.Cho>90].iloc[0].Fat.round(1), 
+    res[res.Cho>90].iloc[0].Cho.round(1), 
     np.round(res[res.Cho>90].iloc[0].Power / map * 100,1)],
-    'Lt1':[lt1.Power.round(0), 
-           lt1.Fat.round(0), 
-           lt1.Cho.round(0), 
-           np.round(lt1.Power/map*100,0)],
+    'Lt1':[lt1.Power.round(0), lt1.Fat.round(1), lt1.Cho.round(1), np.round(lt1.Power/map*100,1)],
     
-    'MLSS': [np.round(sAT,0), 
-             0, 
-             np.round(CHO_util[arg_sAT],1), 
-             np.round(sAT/map*100,0)],
-    'Vo2max': [np.round(map,1), 
-               0, 
-               np.round(res[res.Power>=map].iloc[0].Cho,1),
-               100]
+    'MLSS': [np.round(sAT,0), 0, np.round(CHO_util[arg_sAT],1), np.round((res.loc[arg_sAT].Power/map)*100,1)],
+    'Vo2max': [map, 0, res[res.Power>=vo2max/(Ks4/weight)].iloc[0].Cho,100]
     
 }
 
@@ -154,9 +143,9 @@ Analyze the following metabolic profile for an athlete:
 
 - VO2max: {vo2max} ml/min/kg
 - VLaMax: {vlamax} mmol/L/s
-- FatMax occurs at {res[res.index == res.Fat.argmax()].Power.iloc[0].round(0)} W with this value of consommation {np.max(Fat_util) * 9.5}
+- FatMax occurs at {res[res.index == res.Fat.argmax()].Power.iloc[0]} W with this value of consommation {np.max(Fat_util) * 9.5}
 - Lt1 is at {lt1.Power.round(0):} W
-- Lt2 (Max Lactate Steady State) occurs at {np.round(sAT,1):.1f} W  
+- Lt2 (Max Lactate Steady State) occurs at {sAT:.1f} W  
 
 
 1) Compare the values to the litterature and normative value for elite athletes, especially VO2max, Lt2, fatmax Watts and fat oxydation 
@@ -170,20 +159,47 @@ do it in maximum 250 words
 
 client = OpenAI(api_key = st.secrets["openai"]["api_key"])
 
+
+
 def generate_pdf(figures, table_data, analysis_text):
     pdf = FPDF()
     pdf.set_auto_page_break(auto=False)
     pdf.add_page()
 
+    # Title
     pdf.set_font("Arial", 'B', 16)
     pdf.cell(200, 10, "Metabolic Profile Analysis", ln=True, align='C')
     pdf.ln(5)
 
+    # Save the first two figures in the same row
     img_buffer1 = BytesIO()
     figures[0].savefig(img_buffer1, format='png')
     img_buffer1.seek(0)
-    pdf.image(img_buffer1, x=10, y=30, w=80)
+    img_path1 = "plot_0.png"
+    with open(img_path1, "wb") as f:
+        f.write(img_buffer1.getvalue())
+    
+    img_buffer2 = BytesIO()
+    figures[1].savefig(img_buffer2, format='png')
+    img_buffer2.seek(0)
+    img_path2 = "plot_1.png"
+    with open(img_path2, "wb") as f:
+        f.write(img_buffer2.getvalue())
+    
+    pdf.image(img_path1, x=10, y=30, w=80)
+    pdf.image(img_path2, x=110, y=30, w=80)
 
+    # Save and add the last figure (centered and below the first two)
+    img_buffer3 = BytesIO()
+    figures[2].savefig(img_buffer3, format='png')
+    img_buffer3.seek(0)
+    img_path3 = "plot_2.png"
+    with open(img_path3, "wb") as f:
+        f.write(img_buffer3.getvalue())
+    
+    pdf.image(img_path3, x=15, y=90, w=160)
+
+    # Table Section
     pdf.ln(150)
     pdf.set_font("Arial", size=8)
 
@@ -192,13 +208,16 @@ def generate_pdf(figures, table_data, analysis_text):
 
     columns = list(table_data.keys())
     column_widths = [20] + [20] * (len(columns) - 1)
-    start_x = (210 - sum(column_widths)) / 2
+    table_width = sum(column_widths)
+    start_x = (210 - table_width) / 2  # Center table
     
+    # Print Table Headers
     pdf.set_x(start_x)
     for i, col in enumerate(columns):
         pdf.cell(column_widths[i], 6, col, border=1, align='C')
     pdf.ln()
-
+    
+    # Print Table Rows
     for i, metric in enumerate(table_data["Metric"]):
         pdf.set_x(start_x)
         pdf.cell(column_widths[0], 6, metric, border=1)
@@ -207,18 +226,18 @@ def generate_pdf(figures, table_data, analysis_text):
             pdf.cell(column_widths[j + 1], 6, str(round(value, 2)), border=1, align='C')
         pdf.ln()
 
-    pdf.ln(10)
+    # AI Analysis Section
+    pdf.ln(10)  # Reduce space
     pdf.set_font("Arial", size=7)
-    pdf.multi_cell(0, 6, analysis_text.encode("latin1", "ignore").decode("latin1"))
+    pdf.multi_cell(0, 6, analysis_text)  # Ensure analysis text appears
 
+    # Save PDF to BytesIO
     pdf_buffer = BytesIO()
-    pdf_content = pdf.output(dest="S").encode("latin1")
+    pdf_content = pdf.output(dest="S").encode("utf-8")
     pdf_buffer.write(pdf_content)
     pdf_buffer.seek(0)
-
+    
     return pdf_buffer
-
-
 
 # --- Streamlit App ---
 if "analysis_text" not in st.session_state:
@@ -232,7 +251,7 @@ st.session_state.analysis_text = st.text_area("AI Performance Analysis", st.sess
 
 if st.button("Generate AI Analysis"):
     response = client.chat.completions.create(
-    model="gpt-4o-mini",  # gpt-3.5-turbo
+    model="gpt-4o-mini",  #gpt-3.5-turbo
     messages=[{"role": "user", "content": prompt}]
 )
 
