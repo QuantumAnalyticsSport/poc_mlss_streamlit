@@ -115,7 +115,7 @@ lt1 = lt1_zone[(lt1_zone.Lactate < lt1_zone.Lactate.max()-.2)].iloc[0]
 
 # Summary Table
 table_data = {
-    'Metric': ['Power', 'Kcal/h', 'Carbs g/h', '% VO2max'],
+    'Metric': ['Power', 'Fat Kcal/h', 'Carbs g/h', '% VO2max'],
     'FatMax': [res[res.index == res.Fat.argmax()].Power.iloc[0] , 
     res[res.index == res.Fat.argmax()].Fat.iloc[0] * 9.5, 
     res[res.index == res.Fat.argmax()].Cho.iloc[0], 
@@ -145,11 +145,11 @@ Analyze the following metabolic profile for an athlete:
 - VLaMax: {vlamax} mmol/L/s
 - FatMax occurs at {res[res.index == res.Fat.argmax()].Power.iloc[0]} W with this value of consommation {np.max(Fat_util) * 9.5}
 - Lt1 is at {lt1.Power.round(0):} W
-- Lt2 (Max Lactate Steady State) occurs at {sAT:.1f} W  
+- Lt2 (Max Lactate Steady State) occurs at {sAT:.1f} W i.e. {np.round((res.loc[arg_sAT].Power/map)*100,1)} % of Vo2max
 
 
-1) Compare the values to the litterature and normative value for elite athletes, especially VO2max, Lt2, fatmax Watts and fat oxydation 
-2) Explain strengths and weaknesses of this athlete for a long distance cycling and areas to train. Use the % of VO2max at Lt2 for that and compare to endurance vs more punchy athlete
+1) Compare the values to the litterature and normative value for athletes, especially VO2max, Lt2, fatmax Watts and fat oxydation 
+2) Explain strengths and weaknesses of this athlete for a long distance endurance and areas to train. Use the % of VO2max at Lt2 for that and compare to endurance vs more punchy athlete
 3) Give the profile of the cyclist : more punchy or endurance rider and which race (Grand tour, classic, sprints, time trial) suits him the most 
 
 do it in maximum 250 words
