@@ -248,7 +248,8 @@ def generate_pdf(figures, table_data, analysis_text):
     pdf_buffer.write(pdf_content)
     pdf_buffer.seek(0)
     
-    return BytesIO(pdf.output(dest="S").encode("latin1"))
+    
+    return BytesIO(pdf.output(dest="S")encode("utf-8")
 
 # --- Streamlit App ---
 if "analysis_text" not in st.session_state:
