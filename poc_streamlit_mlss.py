@@ -170,7 +170,53 @@ do it in maximum 250 words
 
 client = OpenAI(api_key = st.secrets["openai"]["api_key"])
 
+def generate_pdf(figures, table_data, analysis_text):
+    pdf = FPDF()
+    pdf.set_auto_page_break(auto=False)
+    pdf.add_page()
 
+    pdf.set_font("Arial", 'B', 16)
+    pdf.cell(200, 10, "Metabolic Profile Analysis", ln=True, align='C')
+    pdf.ln(5)
+
+    img_buffer1 = BytesIO()
+    figures[0].savefig(img_buffer1, format='png')
+    img_buffer1.seek(0)
+    pdf.image(img_buffer1, x=10, y=30, w=80)
+
+    pdf.ln(150)
+    pdf.set_font("Arial", size=8)
+
+    if "Metric" not in table_data:
+        return None
+
+    columns = list(table_data.keys())
+    column_widths = [20] + [20] * (len(columns) - 1)
+    start_x = (210 - sum(column_widths)) / 2
+    
+    pdf.set_x(start_x)
+    for i, col in enumerate(columns):
+        pdf.cell(column_widths[i], 6, col, border=1, align='C')
+    pdf.ln()
+
+    for i, metric in enumerate(table_data["Metric"]):
+        pdf.set_x(start_x)
+        pdf.cell(column_widths[0], 6, metric, border=1)
+        for j, col in enumerate(columns[1:]):
+            value = table_data[col][i] if i < len(table_data[col]) else 0
+            pdf.cell(column_widths[j + 1], 6, str(round(value, 2)), border=1, align='C')
+        pdf.ln()
+
+    pdf.ln(10)
+    pdf.set_font("Arial", size=7)
+    pdf.multi_cell(0, 6, analysis_text.encode("latin1", "ignore").decode("latin1"))
+
+    pdf_buffer = BytesIO()
+    pdf_content = pdf.output(dest="S").encode("latin1")
+    pdf_buffer.write(pdf_content)
+    pdf_buffer.seek(0)
+
+    return pdf_buffer
 
 
 
