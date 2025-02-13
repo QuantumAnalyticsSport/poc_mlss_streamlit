@@ -163,79 +163,77 @@ client = OpenAI(api_key = st.secrets["openai"]["api_key"])
 
 def generate_pdf(figures, table_data, analysis_text):
     pdf = FPDF()
-    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.set_auto_page_break(auto=False)
     pdf.add_page()
 
     # Title
     pdf.set_font("Arial", 'B', 16)
     pdf.cell(200, 10, "Metabolic Profile Analysis", ln=True, align='C')
+    pdf.ln(5)
 
     # Save the first two figures in the same row
     img_buffer1 = BytesIO()
-    figures[0].savefig(img_buffer1, format='png')  # Save first figure to memory
+    figures[0].savefig(img_buffer1, format='png')
     img_buffer1.seek(0)
     img_path1 = "plot_0.png"
     with open(img_path1, "wb") as f:
-        f.write(img_buffer1.getvalue())  # Write to disk
-    pdf.image(img_path1, x=10, w=80)  # First image (smaller width)
-
+        f.write(img_buffer1.getvalue())
+    
     img_buffer2 = BytesIO()
-    figures[1].savefig(img_buffer2, format='png')  # Save second figure to memory
+    figures[1].savefig(img_buffer2, format='png')
     img_buffer2.seek(0)
     img_path2 = "plot_1.png"
     with open(img_path2, "wb") as f:
-        f.write(img_buffer2.getvalue())  # Write to disk
-    pdf.image(img_path2, x=110, w=80)  # Second image (smaller width)
+        f.write(img_buffer2.getvalue())
+    
+    pdf.image(img_path1, x=10, y=30, w=80)
+    pdf.image(img_path2, x=110, y=30, w=80)
 
-    # Save the last figure (larger and centered)
+    # Save and add the last figure (centered and below the first two)
     img_buffer3 = BytesIO()
-    figures[2].savefig(img_buffer3, format='png')  # Save third figure to memory
+    figures[2].savefig(img_buffer3, format='png')
     img_buffer3.seek(0)
     img_path3 = "plot_2.png"
     with open(img_path3, "wb") as f:
-        f.write(img_buffer3.getvalue())  # Write to disk
-    pdf.image(img_path3, x=15, w=180)  # Larger and centered
+        f.write(img_buffer3.getvalue())
+    
+    pdf.image(img_path3, x=15, y=90, w=160)
 
-    # Line break before the table
-    pdf.ln(100)  # Add space for graphs
-
-    # Ensure Table Data is Valid
-    if "Metric" not in table_data:
-        st.error("Error: 'Metric' column not found in table_data.")
-        return None
-
-    # Table Font and Size
+    # Table Section
+    pdf.ln(150)
     pdf.set_font("Arial", size=8)
 
-    # Print Table Headers
-    pdf.cell(50, 10, "Metric", border=1)
+    if "Metric" not in table_data:
+        return None
+
     columns = list(table_data.keys())
-    for col in columns[1:]:
-        pdf.cell(40, 10, col, border=1)
+    column_widths = [20] + [20] * (len(columns) - 1)
+    table_width = sum(column_widths)
+    start_x = (210 - table_width) / 2  # Center table
+    
+    # Print Table Headers
+    pdf.set_x(start_x)
+    for i, col in enumerate(columns):
+        pdf.cell(column_widths[i], 6, col, border=1, align='C')
     pdf.ln()
-
+    
     # Print Table Rows
-    table_data_list = []
     for i, metric in enumerate(table_data["Metric"]):
-        row = {"Metric": metric}
-        for col in columns[1:]:
-            row[col] = table_data[col][i] if i < len(table_data[col]) else 0  # Handle missing values
-        table_data_list.append(row)
-
-    for row in table_data_list:
-        pdf.cell(50, 10, row["Metric"], border=1)
-        for col in columns[1:]:
-            pdf.cell(40, 10, str(round(row[col], 2)), border=1)  # Round values
+        pdf.set_x(start_x)
+        pdf.cell(column_widths[0], 6, metric, border=1)
+        for j, col in enumerate(columns[1:]):
+            value = table_data[col][i] if i < len(table_data[col]) else 0
+            pdf.cell(column_widths[j + 1], 6, str(round(value, 2)), border=1, align='C')
         pdf.ln()
 
-    # AI Analysis Section (Smaller Font)
-    pdf.add_page()
+    # AI Analysis Section
+    pdf.ln(10)  # Reduce space
     pdf.set_font("Arial", size=10)
-    pdf.multi_cell(0, 10, analysis_text)
+    pdf.multi_cell(0, 6, analysis_text)  # Ensure analysis text appears
 
     # Save PDF to BytesIO
     pdf_buffer = BytesIO()
-    pdf_content = pdf.output(dest="S").encode("latin1")  # Convert to byte stream
+    pdf_content = pdf.output(dest="S").encode("latin1")
     pdf_buffer.write(pdf_content)
     pdf_buffer.seek(0)
     
