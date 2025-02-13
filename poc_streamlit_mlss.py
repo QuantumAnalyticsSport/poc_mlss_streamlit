@@ -249,7 +249,7 @@ def generate_pdf(figures, table_data, analysis_text):
     pdf_buffer.seek(0)
     
     
-    return BytesIO(pdf.output(dest="S")encode("utf-8"))
+    return BytesIO(pdf.output(dest="S").encode("utf-8"))
 
 # --- Streamlit App ---
 if "analysis_text" not in st.session_state:
